@@ -5,37 +5,96 @@
 
 ---
 
-## 一键 Docker 部署 (推荐)
+## 服务器部署 (完整流程)
 
-**零配置，一条命令启动：**
+### 前置要求
+
+- 一台 Linux 服务器 (Ubuntu 20.04+ / CentOS 8+ / Debian 11+)
+- 开放 3000 端口
+
+### 第一步：安装 Docker
+
+**Ubuntu/Debian:**
+```bash
+curl -fsSL https://get.docker.com | bash
+```
+
+**CentOS/RHEL:**
+```bash
+yum install -y docker-compose-plugin
+systemctl start docker
+systemctl enable docker
+```
+
+### 第二步：下载代码
+
+```bash
+git clone https://github.com/CplSafe/openclaw-key.git
+cd openclaw-key
+```
+
+### 第三步：配置域名（可选）
+
+如果有域名，修改 `docker-compose.yml` 中的 `WASP_WEB_CLIENT_URL`：
+
+```bash
+sed -i 's|http://localhost:3000|https://your-domain.com|g' docker-compose.yml
+```
+
+### 第四步：启动服务
 
 ```bash
 docker compose up -d
 ```
 
-等待构建完成后访问: http://localhost:3000
+首次启动需要构建镜像，大约 5-10 分钟。
 
-### 默认管理员账号
+### 第五步：访问系统
 
-- **用户名**: `admin`
-- **密码**: `admin123456`
+浏览器打开: `http://你的服务器IP:3000`
 
-⚠️ **安全提示**: 首次登录后请立即在「账号设置」页面修改密码！
+**默认管理员账号:**
+- 用户名: `admin`
+- 密码: `admin123456`
 
-### 服务器部署
+⚠️ **首次登录后请立即修改密码！**
 
-部署到服务器时，修改 `docker-compose.yml` 中的 `WASP_WEB_CLIENT_URL` 为你的域名：
+---
 
-```yaml
-environment:
-  WASP_WEB_CLIENT_URL: https://your-domain.com
-```
-
-然后启动：
+## 常用命令
 
 ```bash
+# 查看日志
+docker compose logs -f
+
+# 停止服务
+docker compose down
+
+# 重启服务
+docker compose restart
+
+# 更新到最新版本
+git pull
 docker compose up -d --build
 ```
+
+---
+
+## 本地开发
+
+**前置要求:**
+- Node.js 22+
+- PostgreSQL
+- Wasp CLI (`npm i -g @wasp.sh/wasp-cli@0.21.1`)
+
+**启动开发服务器:**
+```bash
+npm install
+wasp db migrate-dev
+wasp start
+```
+
+访问 http://localhost:3000
 
 ---
 
@@ -66,31 +125,6 @@ Telegram、WhatsApp、飞书、Discord、Slack、Google Chat、Signal、iMessage
     ↓
 URL 永久失效
 ```
-
----
-
-## 开发环境
-
-### 前置要求
-
-- Node.js 22+
-- PostgreSQL 数据库
-- Wasp CLI (`npm i -g @wasp.sh/wasp-cli@0.21.1`)
-
-### 启动开发服务器
-
-```bash
-# 安装依赖
-npm install
-
-# 初始化数据库
-wasp db migrate-dev
-
-# 启动
-wasp start
-```
-
-访问 http://localhost:3000
 
 ---
 

@@ -30,24 +30,39 @@ URL 永久失效
 
 ## 快速开始
 
+### 前置要求
+- Node.js 22+
+- PostgreSQL 数据库
+- Wasp CLI (`npm i -g @wasp.sh/wasp-cli@latest`)
+
 ### 开发环境
 
 ```bash
-# 安装依赖
+# 1. 安装依赖
 npm install
 
-# 配置环境变量
-cp .env.server.example .env.server
-# 编辑填写: DATABASE_URL, ENCRYPTION_KEY, JWT_SECRET
+# 2. 配置环境变量（已预配置密钥）
+# DATABASE_URL 需要修改为你的 PostgreSQL 连接字符串
+cat .env.server
 
-# 生成加密密钥
-node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-
-# 初始化数据库
+# 3. 初始化数据库
 wasp db migrate-dev
 
-# 启动开发服务器
+# 4. 启动开发服务器
 wasp start
+```
+
+访问 http://localhost:3000
+
+### 首次使用
+
+1. 访问 `/login` 页面创建管理员账号
+2. 登录后进入仪表盘
+3. 点击"卡密管理" → "创建卡密"
+4. 选择通信渠道（Telegram、飞书等）并填写凭证
+5. 配置 AI 模型 API Key
+6. 复制生成的安装命令
+7. 用户在终端执行: `curl -fsSL <URL> | bash`
 ```
 
 ### 生产部署

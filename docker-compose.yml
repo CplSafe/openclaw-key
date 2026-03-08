@@ -7,7 +7,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: openclaw
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-openclaw_secret_2026}
+      POSTGRES_PASSWORD: openclaw_secret_2026
       POSTGRES_DB: openclaw_manager
     volumes:
       - pgdata:/var/lib/postgresql/data
@@ -21,17 +21,15 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      args:
-        API_BASE_URL: ${API_BASE_URL:-http://localhost:3000}
     container_name: openclaw-app
     restart: unless-stopped
     ports:
-      - "${APP_PORT:-3000}:80"
+      - "3000:80"
     environment:
-      DATABASE_URL: postgresql://openclaw:${DB_PASSWORD:-openclaw_secret_2026}@db:5432/openclaw_manager
-      JWT_SECRET: ${JWT_SECRET}
-      ENCRYPTION_KEY: ${ENCRYPTION_KEY}
-      WASP_WEB_CLIENT_URL: ${API_BASE_URL:-http://localhost:3000}
+      DATABASE_URL: postgresql://openclaw:openclaw_secret_2026@db:5432/openclaw_manager
+      JWT_SECRET: openclaw_jwt_secret_key_2026_production
+      ENCRYPTION_KEY: openclaw_encryption_key_2026_32chars
+      WASP_WEB_CLIENT_URL: http://localhost:3000
       WASP_SERVER_URL: http://localhost:3001
       PORT: 3001
     depends_on:

@@ -1,52 +1,83 @@
 # ============================================
-# OpenClaw 生产镜像
-# 需要先运行 ./deploy.sh 准备构建产物
+# OpenClaw All-in-One
+# wasp build + vite build + nginx + node
+# 使用者只需 docker compose up -d
 # ============================================
 
+# ---- 阶段1: 在容器内完成 wasp build ----
+FROM node:22-alpine AS wasp-builder
+
+RUN apk add --no-cache python3 build-base libtool autoconf automake curl bash git
+
+# 安装 Wasp CLI
+RUN npm i -g @wasp.sh/wasp-cli@0.21.1
+
+WORKDIR /app
+COPY . .
+
+# wasp build 生成 .wasp/out/
+RUN wasp build
+
+# ---- 阶段2: 构建服务端 bundle ----
 FROM node:22-alpine AS server-builder
 
 RUN apk add --no-cache python3 build-base libtool autoconf automake
 
 WORKDIR /app
 
-# 复制 wasp build 产物（由 deploy.sh 预先准备）
-COPY .wasp/out/src ./src
-COPY .wasp/out/package.json .wasp/out/package-lock.json ./
-COPY .wasp/out/tsconfig*.json ./
-COPY .wasp/out/server .wasp/out/server
-COPY .wasp/out/sdk .wasp/out/sdk
-COPY .wasp/out/libs .wasp/out/libs
-COPY .wasp/out/db .wasp/out/db
-COPY src ./src
+# 从 wasp-builder 复制产物
+COPY --from=wasp-builder /app/src ./src
+COPY --from=wasp-builder /app/.wasp/out/package.json ./
+COPY --from=wasp-builder /app/.wasp/out/package-lock.json ./
+COPY --from=wasp-builder /app/.wasp/out/tsconfig*.json ./
+COPY --from=wasp-builder /app/.wasp/out/server .wasp/out/server
+COPY --from=wasp-builder /app/.wasp/out/sdk .wasp/out/sdk
+COPY --from=wasp-builder /app/.wasp/out/libs .wasp/out/libs
+COPY --from=wasp-builder /app/.wasp/out/db .wasp/out/db
 
-# 安装依赖并构建
 RUN npm install && cd .wasp/out/server && npm install
 RUN cd .wasp/out/server && npx prisma generate --schema='../db/schema.prisma'
 RUN cd .wasp/out/server && npm run bundle
 RUN mkdir -p .wasp/out/server/node_modules
 
+# ---- 阶段3: 构建前端静态文件 ----
+FROM node:22-alpine AS web-builder
 
-FROM node:22-alpine AS production
-
-RUN apk add --no-cache python3 nginx supervisor curl
-
-ENV NODE_ENV=production
+RUN apk add --no-cache python3 build-base
 
 WORKDIR /app
 
-# 服务端文件
+# 复制整个项目 + wasp 产物 (vite 需要 wasp 插件)
+COPY --from=wasp-builder /app /app
+
+# 确保依赖装好
+RUN npm install
+
+# Vite 构建前端
+RUN npx vite build --outDir /app/web-build
+
+# ---- 阶段4: 最终生产镜像 ----
+FROM node:22-alpine
+
+RUN apk add --no-cache nginx supervisor curl
+
+WORKDIR /app
+
+# 服务端
 COPY --from=server-builder /app/node_modules ./node_modules
 COPY --from=server-builder /app/.wasp/out/server/node_modules .wasp/out/server/node_modules
 COPY --from=server-builder /app/.wasp/out/server/bundle .wasp/out/server/bundle
 COPY --from=server-builder /app/.wasp/out/server/package*.json .wasp/out/server/
 COPY --from=server-builder /app/.wasp/out/db .wasp/out/db
 
-# 前端静态文件（由 deploy.sh 预先构建）
-COPY web-build /usr/share/nginx/html
+# 前端静态文件
+COPY --from=web-builder /app/web-build /usr/share/nginx/html
 
-# 配置文件
+# 配置
 COPY deploy/nginx.conf /etc/nginx/http.d/default.conf
 COPY deploy/supervisord.conf /etc/supervisord.conf
+
+ENV NODE_ENV=production
 
 EXPOSE 80
 

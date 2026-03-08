@@ -10,7 +10,7 @@ generator client {
 model User {
   id          Int       @id @default(autoincrement())
   username    String    @unique
-  password    String
+  password    String?
   isAdmin     Boolean   @default(true)
   createdAt   DateTime  @default(now())
 }
@@ -22,6 +22,10 @@ model LicenseKey {
   machineId     String?
   osType        String?
   ipAddress     String?
+  city          String?
+  country       String?
+  latitude      Float?
+  longitude     Float?
 
   channels      ChannelConfig[]
   modelConfig   ModelConfig?
@@ -66,6 +70,10 @@ model InstallLog {
   osType        String
   status        String
   errorMsg      String?
+  city          String?
+  country       String?
+  latitude      Float?
+  longitude     Float?
 
   createdAt     DateTime    @default(now())
 

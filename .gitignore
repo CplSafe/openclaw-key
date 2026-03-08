@@ -1,6 +1,12 @@
+.env
 .env.server
 .wasp/
 node_modules/
 dist/
+web-build/
 .DS_Store
 *.log
+*.png
+check-*.mjs
+debug-*.mjs
+find-*.mjs

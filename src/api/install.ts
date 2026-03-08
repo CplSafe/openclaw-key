@@ -5,6 +5,7 @@ import {
   generateVerifyScript,
   generateInstallScript,
 } from "../utils/scriptGenerator.js";
+import { lookupIpGeo } from "../utils/geoip.js";
 
 export const handleInstallScript = async (
   req: Request,
@@ -74,6 +75,9 @@ export const handleVerifyInstall = async (
       return;
     }
 
+    // Lookup geolocation for the IP
+    const geo = await lookupIpGeo(ipAddress);
+
     // 更新卡密状态
     await prisma.licenseKey.update({
       where: { id: license.id },
@@ -82,6 +86,10 @@ export const handleVerifyInstall = async (
         machineId,
         osType,
         ipAddress,
+        city: geo.city,
+        country: geo.country,
+        latitude: geo.latitude,
+        longitude: geo.longitude,
         usedAt: new Date(),
       },
     });
@@ -94,6 +102,10 @@ export const handleVerifyInstall = async (
         ipAddress,
         osType,
         status: "success",
+        city: geo.city,
+        country: geo.country,
+        latitude: geo.latitude,
+        longitude: geo.longitude,
       },
     });
 

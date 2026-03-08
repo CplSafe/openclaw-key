@@ -2,7 +2,7 @@ app OpenClawManager {
   wasp: {
     version: "^0.21.1"
   },
-  title: "OpenClaw License Manager",
+  title: "OpenClaw 许可证管理系统",
 
   auth: {
     userEntity: User,
@@ -10,6 +10,10 @@ app OpenClawManager {
       usernameAndPassword: {}
     },
     onAuthFailedRedirectTo: "/login"
+  },
+
+  server: {
+    setupFn: import { serverSetup } from "@src/server/setup"
   }
 }
 
@@ -23,6 +27,18 @@ api verifyInstall {
   fn: import { handleVerifyInstall } from "@src/api/install",
   httpRoute: (POST, "/api/verify-install"),
   auth: false
+}
+
+api updatePassword {
+  fn: import { updatePassword } from "@src/api/auth",
+  httpRoute: (POST, "/api/auth/update-password"),
+  auth: true
+}
+
+api updateUsername {
+  fn: import { updateUsername } from "@src/api/auth",
+  httpRoute: (POST, "/api/auth/update-username"),
+  auth: true
 }
 
 query getLicenses {
@@ -43,6 +59,7 @@ action revokeLicense {
 route LoginRoute { path: "/login", to: LoginPage }
 route DashboardRoute { path: "/", to: DashboardPage }
 route LicenseRoute { path: "/licenses", to: LicensePage }
+route SettingsRoute { path: "/settings", to: SettingsPage }
 
 page LoginPage {
   component: import { LoginPage } from "@src/pages/LoginPage"
@@ -56,4 +73,9 @@ page DashboardPage {
 page LicensePage {
   authRequired: true,
   component: import { LicensePage } from "@src/pages/LicensePage"
+}
+
+page SettingsPage {
+  authRequired: true,
+  component: import { SettingsPage } from "@src/pages/SettingsPage"
 }

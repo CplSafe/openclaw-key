@@ -1,0 +1,14 @@
+node_modules
+.env
+.env.server
+.git
+*.log
+*.md
+!README.md
+.DS_Store
+login-page-debug.png
+check-dom.mjs
+check-render.mjs
+debug-*.mjs
+find-404-module.mjs
+migrations

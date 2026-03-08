@@ -1,15 +1,29 @@
-import { LoginForm } from 'wasp/client/auth';
+import "../index.css";
+import { ChineseLoginForm } from "../auth/LoginForm";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
 
 export function LoginPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900">OpenClaw Manager</h2>
-          <p className="mt-2 text-sm text-gray-600">卡密管理系统</p>
-        </div>
-        <LoginForm />
-      </div>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100">
+      <Card className="w-full max-w-md">
+        <CardHeader className="space-y-1 text-center">
+          <CardTitle className="text-3xl font-bold tracking-tight">
+            OpenClaw 许可证管理系统
+          </CardTitle>
+          <CardDescription className="text-base">
+            请使用管理员账号登录
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ChineseLoginForm />
+        </CardContent>
+      </Card>
     </div>
   );
 }

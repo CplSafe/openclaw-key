@@ -1,9 +1,9 @@
-import type { GetLicenses } from 'wasp/server/operations';
-import { HttpError } from 'wasp/server';
+import type { GetLicenses } from "wasp/server/operations";
+import { HttpError } from "wasp/server";
 
 export const getLicenses: GetLicenses = async (args, context) => {
   if (!context.user) {
-    throw new HttpError(401, '未授权');
+    throw new HttpError(401, "未授权");
   }
 
   const licenses = await context.entities.LicenseKey.findMany({
@@ -11,24 +11,28 @@ export const getLicenses: GetLicenses = async (args, context) => {
       channels: true,
       modelConfig: true,
       installLogs: {
-        orderBy: { createdAt: 'desc' },
-        take: 1
-      }
+        orderBy: { createdAt: "desc" },
+        take: 1,
+      },
     },
-    orderBy: { createdAt: 'desc' }
+    orderBy: { createdAt: "desc" },
   });
 
-  return licenses.map(license => ({
+  return licenses.map((license) => ({
     id: license.id,
     token: license.token,
     status: license.status,
     machineId: license.machineId,
     osType: license.osType,
     ipAddress: license.ipAddress,
+    city: license.city,
+    country: license.country,
+    latitude: license.latitude,
+    longitude: license.longitude,
     createdAt: license.createdAt,
     usedAt: license.usedAt,
     channelCount: license.channels.length,
     hasModel: !!license.modelConfig,
-    lastInstallLog: license.installLogs[0] || null
+    lastInstallLog: license.installLogs[0] || null,
   }));
 };

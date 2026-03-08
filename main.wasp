@@ -1,0 +1,26 @@
+app OpenClawManager {
+  wasp: {
+    version: "^0.15.0"
+  },
+  title: "OpenClaw License Manager",
+
+  auth: {
+    userEntity: User,
+    methods: {
+      usernameAndPassword: {}
+    },
+    onAuthFailedRedirectTo: "/login"
+  },
+
+  db: {
+    system: PostgreSQL
+  }
+}
+
+entity User {=psl
+  id          Int       @id @default(autoincrement())
+  username    String    @unique
+  password    String
+  isAdmin     Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+psl=}

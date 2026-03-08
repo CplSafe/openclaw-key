@@ -1,14 +1,25 @@
-import { useState } from 'react';
-import { useQuery } from 'wasp/client/operations';
-import { getLicenses } from 'wasp/client/operations';
-import { Link } from 'wasp/client/router';
-import { CreateLicenseModal } from '../components/CreateLicenseModal';
+import { useState } from "react";
+import { useQuery } from "wasp/client/operations";
+import { getLicenses } from "wasp/client/operations";
+import { Link } from "wasp/client/router";
+import { CreateLicenseModal } from "../components/CreateLicenseModal";
+
+type License = {
+  id: string;
+  token: string;
+  status: string;
+  machineId?: string | null;
+  channelCount: number;
+  createdAt: Date;
+};
 
 export function LicensePage() {
   const { data: licenses, isLoading, refetch } = useQuery(getLicenses);
   const [showCreate, setShowCreate] = useState(false);
 
   if (isLoading) return <div>加载中...</div>;
+
+  const licenseList = (licenses as License[]) || [];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -42,16 +53,28 @@ export function LicensePage() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">令牌</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">状态</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">机器码</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">渠道数</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">创建时间</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  令牌
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  状态
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  机器码
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  渠道数
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  创建时间
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  操作
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {licenses?.map(license => (
+              {licenseList.map((license: License) => (
                 <tr key={license.id}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-mono">
                     {license.token.substring(0, 8)}...
@@ -60,21 +83,25 @@ export function LicensePage() {
                     <StatusBadge status={license.status} />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {license.machineId ? license.machineId.substring(0, 12) + '...' : '-'}
+                    {license.machineId
+                      ? license.machineId.substring(0, 12) + "..."
+                      : "-"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {license.channelCount}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(license.createdAt).toLocaleDateString('zh-CN')}
+                    {new Date(license.createdAt).toLocaleDateString("zh-CN")}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    {license.status === 'unused' && (
+                    {license.status === "unused" && (
                       <button
                         onClick={() => {
                           const url = `${window.location.origin}/api/install/${license.token}.sh`;
-                          navigator.clipboard.writeText(`curl -fsSL ${url} | bash`);
-                          alert('安装命令已复制！');
+                          navigator.clipboard.writeText(
+                            `curl -fsSL ${url} | bash`,
+                          );
+                          alert("安装命令已复制！");
                         }}
                         className="text-blue-600 hover:text-blue-800"
                       >
@@ -104,19 +131,21 @@ export function LicensePage() {
 
 function StatusBadge({ status }: { status: string }) {
   const colors: Record<string, string> = {
-    unused: 'bg-green-100 text-green-800',
-    used: 'bg-gray-100 text-gray-800',
-    revoked: 'bg-red-100 text-red-800'
+    unused: "bg-green-100 text-green-800",
+    used: "bg-gray-100 text-gray-800",
+    revoked: "bg-red-100 text-red-800",
   };
 
   const labels: Record<string, string> = {
-    unused: '未使用',
-    used: '已使用',
-    revoked: '已撤销'
+    unused: "未使用",
+    used: "已使用",
+    revoked: "已撤销",
   };
 
   return (
-    <span className={`px-2 py-1 rounded-full text-xs font-medium ${colors[status]}`}>
+    <span
+      className={`px-2 py-1 rounded-full text-xs font-medium ${colors[status]}`}
+    >
       {labels[status]}
     </span>
   );

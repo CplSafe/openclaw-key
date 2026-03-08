@@ -1,7 +1,7 @@
-import type { CreateLicense, RevokeLicense } from 'wasp/server/operations';
-import { HttpError } from 'wasp/server';
-import { v4 as uuidv4 } from 'uuid';
-import { encrypt } from './utils/crypto.js';
+import type { CreateLicense, RevokeLicense } from "wasp/server/operations";
+import { HttpError } from "wasp/server";
+import { v4 as uuidv4 } from "uuid";
+import { encrypt } from "./utils/crypto.js";
 
 interface ChannelInput {
   type: string;
@@ -15,14 +15,18 @@ interface ModelInput {
   apiEndpoint?: string;
 }
 
-interface CreateLicenseInput {
+type CreateLicenseInput = {
   channels: ChannelInput[];
   model?: ModelInput;
-}
+  [key: string]: any;
+};
 
-export const createLicense: CreateLicense<CreateLicenseInput, { token: string; installUrl: string }> = async (args, context) => {
+export const createLicense: CreateLicense<
+  CreateLicenseInput,
+  { token: string; installUrl: string }
+> = async (args, context) => {
   if (!context.user) {
-    throw new HttpError(401, '未授权');
+    throw new HttpError(401, "未授权");
   }
 
   const token = uuidv4();
@@ -30,40 +34,45 @@ export const createLicense: CreateLicense<CreateLicenseInput, { token: string; i
   const license = await context.entities.LicenseKey.create({
     data: {
       token,
-      status: 'unused',
+      status: "unused",
       channels: {
-        create: args.channels.map(ch => ({
+        create: args.channels.map((ch) => ({
           channelType: ch.type,
           credentials: encrypt(JSON.stringify(ch.credentials)),
-          enabled: true
-        }))
+          enabled: true,
+        })),
       },
-      modelConfig: args.model ? {
-        create: {
-          provider: args.model.provider,
-          modelName: args.model.modelName,
-          apiKey: encrypt(args.model.apiKey),
-          apiEndpoint: args.model.apiEndpoint
-        }
-      } : undefined
-    }
+      modelConfig: args.model
+        ? {
+            create: {
+              provider: args.model.provider,
+              modelName: args.model.modelName,
+              apiKey: encrypt(args.model.apiKey),
+              apiEndpoint: args.model.apiEndpoint,
+            },
+          }
+        : undefined,
+    },
   });
 
-  const apiBase = process.env.API_BASE_URL || 'http://localhost:3000';
+  const apiBase = process.env.API_BASE_URL || "http://localhost:3000";
 
   return {
     token: license.token,
-    installUrl: `${apiBase}/api/install/${token}.sh`
+    installUrl: `${apiBase}/api/install/${token}.sh`,
   };
 };
 
-export const revokeLicense: RevokeLicense<{ licenseId: string }, void> = async (args, context) => {
+export const revokeLicense: RevokeLicense<{ licenseId: string }, void> = async (
+  args,
+  context,
+) => {
   if (!context.user) {
-    throw new HttpError(401, '未授权');
+    throw new HttpError(401, "未授权");
   }
 
   await context.entities.LicenseKey.update({
     where: { id: args.licenseId },
-    data: { status: 'revoked' }
+    data: { status: "revoked" },
   });
 };

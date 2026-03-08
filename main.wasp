@@ -1,6 +1,6 @@
 app OpenClawManager {
   wasp: {
-    version: "^0.15.0"
+    version: "^0.21.1"
   },
   title: "OpenClaw License Manager",
 
@@ -10,88 +10,19 @@ app OpenClawManager {
       usernameAndPassword: {}
     },
     onAuthFailedRedirectTo: "/login"
-  },
-
-  db: {
-    system: PostgreSQL
   }
 }
 
-entity User {=psl
-  id          Int       @id @default(autoincrement())
-  username    String    @unique
-  password    String
-  isAdmin     Boolean   @default(true)
-  createdAt   DateTime  @default(now())
-psl=}
-
-entity LicenseKey {=psl
-  id            String         @id @default(uuid())
-  token         String         @unique
-  status        String         @default("unused")
-  machineId     String?
-  osType        String?
-  ipAddress     String?
-
-  channels      ChannelConfig[]
-  modelConfig   ModelConfig?
-  installLogs   InstallLog[]
-
-  createdAt     DateTime       @default(now())
-  usedAt        DateTime?
-  lastCheckAt   DateTime?
-psl=}
-
-entity ChannelConfig {=psl
-  id            String      @id @default(uuid())
-  licenseKey    LicenseKey  @relation(fields: [licenseId], references: [id], onDelete: Cascade)
-  licenseId     String
-
-  channelType   String
-  credentials   String
-  enabled       Boolean     @default(true)
-
-  @@index([licenseId])
-psl=}
-
-entity ModelConfig {=psl
-  id            String      @id @default(uuid())
-  licenseKey    LicenseKey  @relation(fields: [licenseId], references: [id], onDelete: Cascade)
-  licenseId     String      @unique
-
-  provider      String
-  modelName     String
-  apiKey        String
-  apiEndpoint   String?
-  extraConfig   String?
-psl=}
-
-entity InstallLog {=psl
-  id            String      @id @default(uuid())
-  licenseKey    LicenseKey  @relation(fields: [licenseId], references: [id], onDelete: Cascade)
-  licenseId     String
-
-  machineId     String
-  ipAddress     String
-  osType        String
-  status        String
-  errorMsg      String?
-
-  createdAt     DateTime    @default(now())
-
-  @@index([licenseId])
-  @@index([createdAt])
-psl=}
-
 api installScript {
   fn: import { handleInstallScript } from "@src/api/install",
-  httpRoute: (GET, "/api/install/:token")
+  httpRoute: (GET, "/api/install/:token"),
+  auth: false
 }
 
 api verifyInstall {
   fn: import { handleVerifyInstall } from "@src/api/install",
   httpRoute: (POST, "/api/verify-install"),
-  entities: [LicenseKey, ChannelConfig, ModelConfig, InstallLog]
+  auth: false
 }
 
 query getLicenses {

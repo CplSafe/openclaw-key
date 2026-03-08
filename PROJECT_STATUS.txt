@@ -1,0 +1,105 @@
+# OpenClaw License Manager - 项目状态
+
+## 已完成功能 ✅
+
+### 1. 核心功能
+- ✅ Wasp 项目初始化
+- ✅ PostgreSQL 数据库 schema 定义
+- ✅ AES-256-GCM 加密工具实现
+- ✅ 跨平台脚本生成器（Unix/Windows）
+- ✅ 二段式验证 API 端点
+- ✅ 卡密管理 Actions/Queries
+
+### 2. 前端页面
+- ✅ 登录页面
+- ✅ 仪表盘（统计数据展示）
+- ✅ 卡密管理页面
+- ✅ 创建卡密模态框
+
+### 3. 数据库实体
+- ✅ User（用户）
+- ✅ LicenseKey（卡密）
+- ✅ ChannelConfig（渠道配置）
+- ✅ ModelConfig（AI 模型配置）
+- ✅ InstallLog（安装日志）
+
+### 4. 安全机制
+- ✅ 二段式验证（防止脚本泄露）
+- ✅ 一次性使用（UUID token）
+- ✅ 机器码绑定
+- ✅ 敏感信息加密存储
+
+### 5. 部署配置
+- ✅ Fly.io 配置文件
+- ✅ 自动化部署脚本
+- ✅ 环境变量配置
+
+## 项目结构
+
+```
+openclaw/
+├── main.wasp                      # Wasp 配置文件
+├── .env.server                    # 环境变量（已配置密钥）
+├── src/
+│   ├── api/
+│   │   └── install.ts             # 安装 API（验证脚本 + 验证端点）
+│   ├── actions.ts                 # createLicense, revokeLicense
+│   ├── queries.ts                 # getLicenses
+│   ├── pages/
+│   │   ├── LoginPage.tsx
+│   │   ├── DashboardPage.tsx
+│   │   └── LicensePage.tsx
+│   ├── components/
+│   │   └── CreateLicenseModal.tsx
+│   └── utils/
+│       ├── crypto.ts              # AES-256-GCM 加密
+│       └── scriptGenerator.ts     # 脚本生成器
+├── fly.toml                       # Fly.io 部署配置
+├── scripts/deploy.sh              # 自动化部署脚本
+└── README.md                      # 项目文档
+
+## 下一步
+
+### 必需（启动前）
+1. 配置 PostgreSQL 数据库连接字符串
+2. 运行 `wasp db migrate-dev` 初始化数据库
+3. 创建管理员账号
+
+### 可选（增强功能）
+1. 添加单元测试
+2. 添加 E2E 测试
+3. 实现撤销卡密功能
+4. 添加更多通信渠道支持
+5. 实现批量创建卡密
+6. 添加使用统计图表
+
+## 启动命令
+
+开发环境：
+```bash
+wasp start
+```
+
+生产部署：
+```bash
+./scripts/deploy.sh
+```
+
+## API 端点
+
+- GET  /api/install/:token.sh    - 获取验证脚本（Unix）
+- GET  /api/install/:token.ps1   - 获取验证脚本（Windows）
+- POST /api/verify-install       - 验证并返回真实安装脚本
+- Query getLicenses              - 获取所有卡密
+- Action createLicense           - 创建卡密
+- Action revokeLicense           - 撤销卡密
+
+## 支持的通信渠道
+
+当前已实现：
+- Telegram
+- 飞书 (Feishu)
+- Discord
+- Slack
+
+可通过通用配置添加更多渠道。

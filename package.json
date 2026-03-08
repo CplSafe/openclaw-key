@@ -1,11 +1,21 @@
 {
   "name": "openclaw-manager",
   "version": "0.1.0",
-  "private": true,
+  "type": "module",
+  "workspaces": [
+    ".wasp/out/*",
+    ".wasp/out/sdk/wasp"
+  ],
   "dependencies": {
-    "uuid": "^10.0.0"
+    "uuid": "^10.0.0",
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1",
+    "react-router": "^7.12.0"
   },
   "devDependencies": {
-    "@types/uuid": "^10.0.0"
+    "@types/uuid": "^10.0.0",
+    "prisma": "5.19.1",
+    "typescript": "5.8.2",
+    "vite": "^7.0.6"
   }
 }

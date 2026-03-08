@@ -1,0 +1,74 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id          Int       @id @default(autoincrement())
+  username    String    @unique
+  password    String
+  isAdmin     Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+}
+
+model LicenseKey {
+  id            String         @id @default(uuid())
+  token         String         @unique
+  status        String         @default("unused")
+  machineId     String?
+  osType        String?
+  ipAddress     String?
+
+  channels      ChannelConfig[]
+  modelConfig   ModelConfig?
+  installLogs   InstallLog[]
+
+  createdAt     DateTime       @default(now())
+  usedAt        DateTime?
+  lastCheckAt   DateTime?
+}
+
+model ChannelConfig {
+  id            String      @id @default(uuid())
+  licenseKey    LicenseKey  @relation(fields: [licenseId], references: [id], onDelete: Cascade)
+  licenseId     String
+
+  channelType   String
+  credentials   String
+  enabled       Boolean     @default(true)
+
+  @@index([licenseId])
+}
+
+model ModelConfig {
+  id            String      @id @default(uuid())
+  licenseKey    LicenseKey  @relation(fields: [licenseId], references: [id], onDelete: Cascade)
+  licenseId     String      @unique
+
+  provider      String
+  modelName     String
+  apiKey        String
+  apiEndpoint   String?
+  extraConfig   String?
+}
+
+model InstallLog {
+  id            String      @id @default(uuid())
+  licenseKey    LicenseKey  @relation(fields: [licenseId], references: [id], onDelete: Cascade)
+  licenseId     String
+
+  machineId     String
+  ipAddress     String
+  osType        String
+  status        String
+  errorMsg      String?
+
+  createdAt     DateTime    @default(now())
+
+  @@index([licenseId])
+  @@index([createdAt])
+}

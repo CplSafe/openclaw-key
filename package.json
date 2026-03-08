@@ -1,0 +1,11 @@
+{
+  "name": "openclaw-manager",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "uuid": "^10.0.0"
+  },
+  "devDependencies": {
+    "@types/uuid": "^10.0.0"
+  }
+}

@@ -24,3 +24,105 @@ entity User {=psl
   isAdmin     Boolean   @default(true)
   createdAt   DateTime  @default(now())
 psl=}
+
+entity LicenseKey {=psl
+  id            String         @id @default(uuid())
+  token         String         @unique
+  status        String         @default("unused")
+  machineId     String?
+  osType        String?
+  ipAddress     String?
+
+  channels      ChannelConfig[]
+  modelConfig   ModelConfig?
+  installLogs   InstallLog[]
+
+  createdAt     DateTime       @default(now())
+  usedAt        DateTime?
+  lastCheckAt   DateTime?
+psl=}
+
+entity ChannelConfig {=psl
+  id            String      @id @default(uuid())
+  licenseKey    LicenseKey  @relation(fields: [licenseId], references: [id], onDelete: Cascade)
+  licenseId     String
+
+  channelType   String
+  credentials   String
+  enabled       Boolean     @default(true)
+
+  @@index([licenseId])
+psl=}
+
+entity ModelConfig {=psl
+  id            String      @id @default(uuid())
+  licenseKey    LicenseKey  @relation(fields: [licenseId], references: [id], onDelete: Cascade)
+  licenseId     String      @unique
+
+  provider      String
+  modelName     String
+  apiKey        String
+  apiEndpoint   String?
+  extraConfig   String?
+psl=}
+
+entity InstallLog {=psl
+  id            String      @id @default(uuid())
+  licenseKey    LicenseKey  @relation(fields: [licenseId], references: [id], onDelete: Cascade)
+  licenseId     String
+
+  machineId     String
+  ipAddress     String
+  osType        String
+  status        String
+  errorMsg      String?
+
+  createdAt     DateTime    @default(now())
+
+  @@index([licenseId])
+  @@index([createdAt])
+psl=}
+
+api installScript {
+  fn: import { handleInstallScript } from "@src/api/install",
+  httpRoute: (GET, "/api/install/:token")
+}
+
+api verifyInstall {
+  fn: import { handleVerifyInstall } from "@src/api/install",
+  httpRoute: (POST, "/api/verify-install"),
+  entities: [LicenseKey, ChannelConfig, ModelConfig, InstallLog]
+}
+
+query getLicenses {
+  fn: import { getLicenses } from "@src/queries",
+  entities: [LicenseKey, ChannelConfig, ModelConfig, InstallLog]
+}
+
+action createLicense {
+  fn: import { createLicense } from "@src/actions",
+  entities: [LicenseKey, ChannelConfig, ModelConfig]
+}
+
+action revokeLicense {
+  fn: import { revokeLicense } from "@src/actions",
+  entities: [LicenseKey]
+}
+
+route LoginRoute { path: "/login", to: LoginPage }
+route DashboardRoute { path: "/", to: DashboardPage }
+route LicenseRoute { path: "/licenses", to: LicensePage }
+
+page LoginPage {
+  component: import { LoginPage } from "@src/pages/LoginPage"
+}
+
+page DashboardPage {
+  authRequired: true,
+  component: import { DashboardPage } from "@src/pages/DashboardPage"
+}
+
+page LicensePage {
+  authRequired: true,
+  component: import { LicensePage } from "@src/pages/LicensePage"
+}

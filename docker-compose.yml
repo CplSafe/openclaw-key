@@ -21,19 +21,16 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      args:
-        API_BASE_URL: http://47.242.255.149:8081
     container_name: openclaw-app
     restart: unless-stopped
     ports:
-      - "8080:80"   # 前端 Nginx
+      - "8080:80"   # 前端
       - "8081:8081" # 后端 API
     environment:
       DATABASE_URL: postgresql://openclaw:openclaw_secret_2026@db:5432/openclaw_manager
       JWT_SECRET: openclaw_jwt_secret_key_2026_production
       ENCRYPTION_KEY: openclaw_encryption_key_2026_32chars
-      WASP_WEB_CLIENT_URL: http://47.242.255.149:8080
-      PORT: 8081
+      REACT_APP_API_URL: http://47.242.255.149:8081
     depends_on:
       db:
         condition: service_healthy

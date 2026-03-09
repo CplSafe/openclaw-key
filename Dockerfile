@@ -7,6 +7,9 @@
 # ---- 阶段1: 在容器内完成 wasp build ----
 FROM node:22-alpine AS wasp-builder
 
+# 使用阿里云镜像源
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
+
 RUN apk add --no-cache python3 build-base libtool autoconf automake curl bash git
 
 # 安装 Wasp CLI
@@ -20,6 +23,8 @@ RUN wasp build
 
 # ---- 阶段2: 构建服务端 bundle ----
 FROM node:22-alpine AS server-builder
+
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
 
 RUN apk add --no-cache python3 build-base libtool autoconf automake
 
@@ -46,6 +51,8 @@ RUN mkdir -p .wasp/out/server/node_modules
 # ---- 阶段3: 构建前端静态文件 ----
 FROM node:22-alpine AS web-builder
 
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
+
 RUN apk add --no-cache python3 build-base
 
 WORKDIR /app
@@ -61,6 +68,8 @@ RUN npx vite build --outDir /app/web-build
 
 # ---- 阶段4: 最终生产镜像 ----
 FROM node:22-alpine
+
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
 
 # 安装运行时依赖 (openssl 是 Prisma 必需的)
 RUN apk add --no-cache nginx supervisor curl openssl openssl-dev

@@ -2,7 +2,11 @@ import type { Request, Response } from "express";
 import { prisma } from "wasp/server";
 import { verify, hash } from "argon2";
 
-export const updatePassword = async (req: Request, res: Response) => {
+export const updatePassword = async (
+  req: Request,
+  res: Response,
+  _context: any,
+) => {
   const { currentPassword, newPassword } = req.body;
 
   const userId = (req as any).user?.id;
@@ -69,7 +73,11 @@ export const updatePassword = async (req: Request, res: Response) => {
   }
 };
 
-export const updateUsername = async (req: Request, res: Response) => {
+export const updateUsername = async (
+  req: Request,
+  res: Response,
+  _context: any,
+) => {
   const { currentPassword, newUsername } = req.body;
 
   const userId = (req as any).user?.id;

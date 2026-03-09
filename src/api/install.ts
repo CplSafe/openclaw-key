@@ -10,7 +10,7 @@ import { lookupIpGeo } from "../utils/geoip.js";
 export const handleInstallScript = async (
   req: Request,
   res: Response,
-  _context?: any,
+  _context: any,
 ) => {
   const token = req.params.token as string;
   const tokenId = token.replace(/\.(sh|ps1)$/, "");
@@ -49,7 +49,7 @@ export const handleInstallScript = async (
 export const handleVerifyInstall = async (
   req: Request,
   res: Response,
-  _context?: any,
+  _context: any,
 ) => {
   const { token, machineId, osType } = req.body;
   const ipAddress = (req.ip ||

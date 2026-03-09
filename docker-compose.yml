@@ -21,6 +21,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        API_BASE_URL: http://47.242.255.149:8080
     container_name: openclaw-app
     restart: unless-stopped
     ports:

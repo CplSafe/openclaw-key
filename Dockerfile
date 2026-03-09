@@ -63,6 +63,9 @@ COPY --from=wasp-builder /app /app
 # 确保依赖装好
 RUN npm install
 
+# 构建时注入 API 地址
+ARG API_BASE_URL=${API_BASE_URL:-http://localhost:3001}
+
 # Vite 构建前端
 RUN npx vite build --outDir /app/web-build
 

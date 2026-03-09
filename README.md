@@ -10,7 +10,7 @@
 ### 前置要求
 
 - 一台 Linux 服务器 (Ubuntu 20.04+ / CentOS 8+ / Debian 11+)
-- 开放 3000 端口
+- 开放 6000 端口
 
 ### 第一步：安装 Docker
 
@@ -38,7 +38,7 @@ cd openclaw-key
 如果有域名，修改 `docker-compose.yml` 中的 `WASP_WEB_CLIENT_URL`：
 
 ```bash
-sed -i 's|http://localhost:3000|https://your-domain.com|g' docker-compose.yml
+sed -i 's|http://localhost:6000|https://your-domain.com|g' docker-compose.yml
 ```
 
 ### 第四步：启动服务
@@ -51,7 +51,7 @@ docker compose up -d
 
 ### 第五步：访问系统
 
-浏览器打开: `http://你的服务器IP:3000`
+浏览器打开: `http://你的服务器IP:6000`
 
 **默认管理员账号:**
 - 用户名: `admin`
@@ -94,7 +94,7 @@ wasp db migrate-dev
 wasp start
 ```
 
-访问 http://localhost:3000
+访问 http://localhost:6000
 
 ---
 
@@ -185,7 +185,7 @@ openclaw/
 | DATABASE_URL | PostgreSQL 连接字符串 | 内置 |
 | JWT_SECRET | JWT 签名密钥 | 内置 |
 | ENCRYPTION_KEY | 数据加密密钥 | 内置 |
-| WASP_WEB_CLIENT_URL | 前端访问地址 | http://localhost:3000 |
+| WASP_WEB_CLIENT_URL | 前端访问地址 | http://localhost:6000 |
 
 生产环境建议修改默认密钥。
 

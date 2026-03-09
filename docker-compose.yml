@@ -32,7 +32,6 @@ services:
       JWT_SECRET: openclaw_jwt_secret_key_2026_production
       ENCRYPTION_KEY: openclaw_encryption_key_2026_32chars
       WASP_WEB_CLIENT_URL: http://47.242.255.149:8080
-      WASP_SERVER_URL: http://47.242.255.149:8081
       PORT: 8081
     depends_on:
       db:

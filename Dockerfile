@@ -66,10 +66,13 @@ RUN npm install
 # 构建时注入 API 地址 (必须作为环境变量传递给 Vite)
 ARG API_BASE_URL=http://localhost:3001
 ENV VITE_API_BASE_URL=$API_BASE_URL
-ENV WASP_SERVER_URL=$API_BASE_URL
+ENV REACT_APP_API_URL=$API_BASE_URL
 
 # Vite 构建前端
 RUN npx vite build --outDir /app/web-build
+
+# 替换打包后的 JS 文件中的 localhost:3001 为实际 API 地址
+RUN find /app/web-build -name "*.js" -exec sed -i 's|http://localhost:3001|'${API_BASE_URL}'|g' {} \;
 
 # ---- 阶段4: 最终生产镜像 ----
 FROM node:22-alpine

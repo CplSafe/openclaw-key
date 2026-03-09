@@ -59,7 +59,8 @@ RUN npx vite build --outDir /app/web-build
 # ---- 阶段4: 最终生产镜像 ----
 FROM node:22-alpine
 
-RUN apk add --no-cache nginx supervisor curl
+# 安装运行时依赖 (openssl 是 Prisma 必需的)
+RUN apk add --no-cache nginx supervisor curl openssl openssl-dev
 
 WORKDIR /app
 

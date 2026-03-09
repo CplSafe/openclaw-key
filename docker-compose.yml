@@ -24,14 +24,14 @@ services:
     container_name: openclaw-app
     restart: unless-stopped
     ports:
-      - "6000:80"
+      - "8080:80"
     environment:
       DATABASE_URL: postgresql://openclaw:openclaw_secret_2026@db:5432/openclaw_manager
       JWT_SECRET: openclaw_jwt_secret_key_2026_production
       ENCRYPTION_KEY: openclaw_encryption_key_2026_32chars
-      WASP_WEB_CLIENT_URL: http://localhost:6000
-      WASP_SERVER_URL: http://localhost:6001
-      PORT: 6001
+      WASP_WEB_CLIENT_URL: http://localhost:8080
+      WASP_SERVER_URL: http://localhost:8081
+      PORT: 8081
     depends_on:
       db:
         condition: service_healthy

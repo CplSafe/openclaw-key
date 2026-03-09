@@ -67,9 +67,6 @@ RUN apk add --no-cache nginx supervisor curl openssl openssl-dev
 
 WORKDIR /app
 
-# 安装 prisma CLI (用于 db push)
-RUN npm install prisma @prisma/client
-
 # 服务端
 COPY --from=server-builder /app/node_modules ./node_modules
 COPY --from=server-builder /app/.wasp/out/server/node_modules .wasp/out/server/node_modules

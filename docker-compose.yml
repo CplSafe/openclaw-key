@@ -22,11 +22,12 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        API_BASE_URL: http://47.242.255.149:8080
+        API_BASE_URL: http://47.242.255.149:8081
     container_name: openclaw-app
     restart: unless-stopped
     ports:
-      - "8080:80"
+      - "8080:80"   # 前端 Nginx
+      - "8081:8081" # 后端 API
     environment:
       DATABASE_URL: postgresql://openclaw:openclaw_secret_2026@db:5432/openclaw_manager
       JWT_SECRET: openclaw_jwt_secret_key_2026_production

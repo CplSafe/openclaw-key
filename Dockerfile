@@ -35,6 +35,9 @@ COPY --from=wasp-builder /app/.wasp/out/sdk .wasp/out/sdk
 COPY --from=wasp-builder /app/.wasp/out/libs .wasp/out/libs
 COPY --from=wasp-builder /app/.wasp/out/db .wasp/out/db
 
+# 添加 Prisma binaryTargets (Wasp 生成的 schema.prisma 没有这个配置)
+RUN sed -i 's/provider = "prisma-client-js"/provider = "prisma-client-js"\n  binaryTargets = ["native", "linux-musl-openssl-3.0.x", "linux-musl"]/' .wasp/out/db/schema.prisma
+
 RUN npm install && cd .wasp/out/server && npm install
 RUN cd .wasp/out/server && npx prisma generate --schema='../db/schema.prisma'
 RUN cd .wasp/out/server && npm run bundle
@@ -63,6 +66,9 @@ FROM node:22-alpine
 RUN apk add --no-cache nginx supervisor curl openssl openssl-dev
 
 WORKDIR /app
+
+# 安装 prisma CLI (用于 db push)
+RUN npm install prisma @prisma/client
 
 # 服务端
 COPY --from=server-builder /app/node_modules ./node_modules

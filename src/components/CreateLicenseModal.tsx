@@ -260,10 +260,19 @@ export function CreateLicenseModal({
       const installUrl = result.installUrl;
       const command = `curl -fsSL ${installUrl} | bash`;
 
-      navigator.clipboard.writeText(command);
-      alert(`卡密创建成功！\n\n安装命令已复制到剪贴板:\n${command}`);
+      // 使用 fallback 方案处理非 HTTPS 环境
+      const textArea = document.createElement('textarea');
+      textArea.value = command;
+      textArea.select();
+      document.execCommand('copy');
+      textArea.remove();
 
-      onSuccess();
+      alert(`卡密创建成功！`);
+
+      // 3秒后自动关闭弹窗
+      setTimeout(() => {
+        setSuccess(false);
+      }, 3000);
     } catch (error: any) {
       alert(`创建失败: ${error.message}`);
     } finally {

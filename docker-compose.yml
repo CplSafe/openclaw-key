@@ -29,7 +29,7 @@ services:
     environment:
       DATABASE_URL: postgresql://openclaw:openclaw_secret_2026@db:5432/openclaw_manager
       JWT_SECRET: openclaw_jwt_secret_key_2026_production
-      ENCRYPTION_KEY: openclaw_encryption_key_2026_32chars
+      ENCRYPTION_KEY: 647ff052d6d2faa164675fee6b771b0bc555277c3587bd80d762769a4ac35214
       REACT_APP_API_URL: http://47.242.255.149:8081
     depends_on:
       db:
